@@ -9,19 +9,23 @@ mima = Cipher(algorithms.AES(k), modes.CBC(v))
 
 s = socket.socket()  # 创建 socket 对象
 host = socket.gethostname()  # 获取本地主机名
-port = 12345  # 设置端口
+port = 12563 # 设置端口
 s.bind((host, port))  # 绑定端口
 
 s.listen(5)  # 等待客户端连接
 c, addr = s.accept()
 print('连接地址：', addr)
 while True:
-    # 建立客户端连接
-    #print('连接地址：', addr)
-    print(c.recv(1024).decode())
+    try:
+        # 建立客户端连接
+        #print('连接地址：', addr)
+        print(c.recv(1024))  #接受sever端发来的信息，打印出来
 
-    text = input()
-    enc = mima.encryptor()
-    pad = padding.PKCS7(256).padder()
-    aa = enc.update(pad.update(text.encode()) + pad.finalize()) + enc.finalize()
-    c.send(aa)
+        text = input()    #键盘输入
+
+        enc = mima.encryptor()    #加密
+        pad = padding.PKCS7(256).padder()   #填充
+        aa = enc.update(pad.update(text.encode()) + pad.finalize()) + enc.finalize()  #得到加密结果aa
+        c.send(aa)     #发送加密信息给sever
+    except:
+        s.close()

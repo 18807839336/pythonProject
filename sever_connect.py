@@ -8,19 +8,24 @@ mima = Cipher(algorithms.AES(k), modes.CBC(v))  #实例化
 #然后，代码定义了一个16字节长的密钥`k`和一个16字节长的向量`v`
 s = socket.socket()  # 创建 socket 对象
 host = socket.gethostname()  # 获取本地主机名
-port = 12345  # 设置端口号
+port = 12563  # 设置端口号
 s.connect((host, port ))
 while True:
-    text=input()
+    text=input()#获取键盘输入
+    enc = mima.encryptor()  # 加密
+    pad = padding.PKCS7(256).padder()  # 填充
+    aa = enc.update(pad.update(text.encode()) + pad.finalize()) + enc.finalize()  # 得到加密结果aa
+    s.send(aa)  #发送加密内容给client端
+
+    jiami2=s.recv(1024)
+    print(jiami2)  # 接受sever端发来的加密信息，打印出来
+
+    t_enc=jiami2  #接受client传过来的加密内容aa,一次接受1024
+    dec = mima.decryptor()   #解密方法
+    unpad = padding.PKCS7(256).unpadder()    #拿掉填充
+    print(unpad.update(dec.update(t_enc) + dec.finalize()) + unpad.finalize())#输出解密内容
 
 
-    s.send(text.encode())
-
-    t_enc=s.recv(1024)
-    dec = mima.decryptor()
-    # 代码调用了加密器`Cipher.encryptor()`方法，并用该加密器对需要加密的文本进行加密。
-    unpad = padding.PKCS7(256).unpadder()
-    print(unpad.update(dec.update(t_enc) + dec.finalize()) + unpad.finalize())
 
 
 

@@ -25,4 +25,3 @@ while True:
     dec = mima.decryptor()   #解密方法
     unpad = padding.PKCS7(256).unpadder()    #拿掉填充
     print(unpad.update(dec.update(t_enc) + dec.finalize()) + unpad.finalize())#输出解密内容
-

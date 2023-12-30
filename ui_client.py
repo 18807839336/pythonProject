@@ -7,7 +7,7 @@ from cryptography.hazmat.primitives.ciphers import algorithms, Cipher, modes
 from cryptography.hazmat.primitives import padding
 import sys
 class Ui_Window(QMainWindow):
-    finished = pyqtSignal(str)
+    finished = pyqtSignal(bytes)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -38,15 +38,17 @@ class Ui_Window(QMainWindow):
     def recv(self):
         while True:
             res = self.s.recv(1024)
-            dec = self.mima.decryptor()  # 解密方法
-            unpad = padding.PKCS7(256).unpadder()  # 拿掉填充
-            jm = unpad.update(dec.update(res) + dec.finalize()) + unpad.finalize()
-            jm = jm.decode()
-            print(jm)  # 输出解密内容
-            self.finished.emit(str(jm))
 
-    def updateText(self,ret:str):
-        self.textDisplay.setText(ret)
+            self.finished.emit(res)
+
+    def updateText(self,ret:bytes):
+        dec = self.mima.decryptor()  # 解密方法
+        unpad = padding.PKCS7(256).unpadder()  # 拿掉填充
+        jm = unpad.update(dec.update(ret) + dec.finalize()) + unpad.finalize()
+        jm = jm.decode()
+        print(jm)  # 输出解密内容
+        self.textDisplay.setText(jm)
+        self.nameDisplay.setText(str(ret))
 
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
@@ -90,7 +92,7 @@ class Ui_Window(QMainWindow):
         self.nameDisplay = QTextBrowser(self.widget)
         self.nameDisplay.setObjectName(u"nameDisplay")
         font = QFont()
-        font.setPointSize(24)
+        font.setPointSize(9)
         font.setItalic(False)
         self.nameDisplay.setFont(font)
 
@@ -148,7 +150,7 @@ class Ui_Window(QMainWindow):
         self.nameDisplay.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:'SimSun'; font-size:24pt; font-weight:400; font-style:normal;\">\n"
+"</style></head><body style=\" font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p align=\"center\" style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;\"><br /></p></body></html>", None))
         self.textEdit.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"

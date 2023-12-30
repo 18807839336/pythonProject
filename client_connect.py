@@ -5,7 +5,7 @@ from cryptography.hazmat.primitives import padding
 k= b'6\x1a\xf66\x10\xc7\xec\xc8\xeb\xde\xf7\xce\xf6\x83\xc7\xe0k:\xae\xa2#\xc9\xd0\xd5\x974\x8e:=6\xddX'
 v = b'Fuw\xec>f8\x97\x13\xf9\xb0\xcfp\xc6\xea\xd0'
 mima = Cipher(algorithms.AES(k), modes.CBC(v))  #实例化
-#然后，代码定义了一个16字节长的密钥`k`和一个16字节长的向量`v`
+#代码定义了一个16字节长的密钥`k`和一个16字节长的向量`v`
 s = socket.socket()  # 创建 socket 对象
 host = socket.gethostname()  # 获取本地主机名
 port = 12965  # 设置端口号

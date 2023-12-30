@@ -7,48 +7,54 @@ from cryptography.hazmat.primitives.ciphers import algorithms, Cipher, modes
 from cryptography.hazmat.primitives import padding
 import sys
 class Ui_Window(QMainWindow):
+    # 信号：提醒界面更新,传输bytes字节流，因为加密解密都是字节流传输进行操作的
     finished = pyqtSignal(bytes)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
+        #给send按钮绑定Text函数逻辑
         self.pushButton_send.clicked.connect(self.Text)
+        #给信号finished绑定updateText函数逻辑
         self.finished.connect(self.updateText)
-        # 首先，代码导入了必要的依赖：`os`模块、`algorithms`、`Cipher`和`modes`类、`padding`模块。其中，`os`模块主要用于生成随机种子，`Cipher`和`modes`类用于创建加密和解密所需的实例，`padding`模块则用于填充。
         k = b'6\x1a\xf66\x10\xc7\xec\xc8\xeb\xde\xf7\xce\xf6\x83\xc7\xe0k:\xae\xa2#\xc9\xd0\xd5\x974\x8e:=6\xddX'
         v = b'Fuw\xec>f8\x97\x13\xf9\xb0\xcfp\xc6\xea\xd0'
         self.mima = Cipher(algorithms.AES(k), modes.CBC(v))  # 实例化
-        # 然后，代码定义了一个16字节长的密钥`k`和一个16字节长的向量`v`
+        # 代码定义了一个16字节长的密钥`k`和一个16字节长的向量`v`
+        #和服务器端sever进行连接
         self.s = socket.socket()  # 创建 socket 对象
         host = socket.gethostname()  # 获取本地主机名
         port = 12965  # 设置端口号
         self.s.connect((host, port))
+        #启动一个线程，函数为recv
         threading.Thread(target=self.recv).start()
-
-    def Text(self):
-        threading.Thread(target=self.send).start()
-
-    def send(self):
-        text = self.textEdit.toPlainText()
-        enc = self.mima.encryptor()  # 加密
-        pad = padding.PKCS7(256).padder()  # 填充
-        aa = enc.update(pad.update(text.encode()) + pad.finalize()) + enc.finalize()  # 得到加密结果aa
-        self.s.send(aa)
 
     def recv(self):
         while True:
-            res = self.s.recv(1024)
+            res = self.s.recv(1024)  #定义res变量为服务器端发送过来的内容
+            self.finished.emit(res)  #将内容发送给信息，要跟新内容
 
-            self.finished.emit(res)
+    def Text(self):
+        ##启动一个线程，函数为send,防止信息堵塞
+        threading.Thread(target=self.send).start()
+
+    def send(self):
+        text = self.textEdit.toPlainText()  #定义text变量为手动输入在文本显示框的内容
+        enc = self.mima.encryptor()  # 加密
+        pad = padding.PKCS7(256).padder()  # 填充
+        aa = enc.update(pad.update(text.encode()) + pad.finalize()) + enc.finalize()  # 将text加密得到结果aa
+        self.s.send(aa)  #发送加密信息aa
 
     def updateText(self,ret:bytes):
+        #ret(形参，随便命名，不要和上面的res起冲突):服务器端发送过来的内容，以字节流形式传入函数，bytes表示传入该函数为字节流形式
         dec = self.mima.decryptor()  # 解密方法
         unpad = padding.PKCS7(256).unpadder()  # 拿掉填充
         jm = unpad.update(dec.update(ret) + dec.finalize()) + unpad.finalize()
+        #定义变量jm为服务器端传入的ret解密内容
         jm = jm.decode()
         print(jm)  # 输出解密内容
-        self.textDisplay.setText(jm)
-        self.nameDisplay.setText(str(ret))
+        self.textDisplay.setText(jm)  #在客户端textDisplay上显示内容
+        self.nameDisplay.setText(str(ret))    #在客户端nameDisplay上显示ret内容，str强制转换成字符型
 
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():

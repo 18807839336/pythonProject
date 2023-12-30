@@ -1,5 +1,4 @@
 import threading
-
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -10,7 +9,7 @@ from cryptography.hazmat.primitives import padding
 
 
 class Ui_MainWindow(QMainWindow):  # 传输一个具体的QMainWindow
-    # 信号：提醒界面更新
+    # 信号：提醒界面更新,传输bytes字节流，因为加密解密都是字节流传输进行操作的
     finished = pyqtSignal(bytes)
 
     def __init__(self, *args, **kwargs):
@@ -23,8 +22,30 @@ class Ui_MainWindow(QMainWindow):  # 传输一个具体的QMainWindow
         self.finished.connect(self.updateText)
         threading.Thread(target=self.ser_socket).start()
 
+    def ser_socket(self):
+        #服务器端开放端口，等待客户端连接
+        s = socket.socket()  # 创建 socket 对象
+        host = socket.gethostname()  # 获取本地主机名
+        port = 12965  # 设置端口
+        s.bind((host, port))  # 绑定端口
+        s.listen()  # 监听
+        self.c, self.addr = s.accept()    #实例化对象之后要用self，表明是对象自己的属性
+        while True:
+            # 建立客户端连接
+            res = self.c.recv(1024)   #res定义为客户端给服务端传来的消息
+            self.finished.emit(res)   #把发送的信息传给信号量，提示更新数据
+            print(res)  # 接受sever端发来的信息，打印出来
+
     def thread_send(self):
+        ##启动一个线程，函数为ser_send,防止信息堵塞
         threading.Thread(target=self.ser_send).start()
+
+    def ser_send(self):
+        text = self.textEdit.toPlainText()   #定义text变量为手动输入在文本显示框的内容
+        enc = self.mima.encryptor()  # 加密
+        pad = padding.PKCS7(256).padder()  # 填充
+        aa = enc.update(pad.update(text.encode()) + pad.finalize()) + enc.finalize()  # 将text加密得到结果aa
+        self.c.send(aa)  # 发送加密信息aa
 
     def updateText(self, ret: bytes):
         dec = self.mima.decryptor()  # 解密方法
@@ -35,30 +56,6 @@ class Ui_MainWindow(QMainWindow):  # 传输一个具体的QMainWindow
         self.textDisplay.setText(str(jm))  #在主页面textDisplay中显示解密内容
         self.textBrowser.setText(str(ret))   #在主页面中textBrowser显示加密内容
 
-    def ser_send(self):
-        text = self.textEdit.toPlainText()
-        enc = self.mima.encryptor()  # 加密
-        pad = padding.PKCS7(256).padder()  # 填充
-        aa = enc.update(pad.update(text.encode()) + pad.finalize()) + enc.finalize()  # 得到加密结果aa
-        self.c.send(aa)  # 发送加密信息给sever
-
-    def ser_socket(self):
-        # 然后，代码定义了一个16字节长的密钥`k`和一个16字节长的向量`v`
-        s = socket.socket()  # 创建 socket 对象
-        host = socket.gethostname()  # 获取本地主机名
-        port = 12965  # 设置端口
-        s.bind((host, port))  # 绑定端口
-        s.listen(5)  # 等待客户端连接
-        self.c, self.addr = s.accept()
-        print('连接地址：', self.addr)
-        while True:
-            # 建立客户端连接
-            # print('连接地址：', addr)
-            print('wait...')
-            res = self.c.recv(1024)
-
-            self.finished.emit(res)
-            print(res)  # 接受sever端发来的信息，打印出来
 
 
     def setupUi(self, MainWindow):

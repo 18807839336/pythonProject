@@ -1,11 +1,53 @@
+import threading
+import socket
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-
+from cryptography.hazmat.primitives.ciphers import algorithms, Cipher, modes
+from cryptography.hazmat.primitives import padding
+import sys
 class Ui_Window(QMainWindow):
+    finished = pyqtSignal(str)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.setupUi(self)
+        self.pushButton_send.clicked.connect(self.Text)
+        self.finished.connect(self.updateText)
+        # 首先，代码导入了必要的依赖：`os`模块、`algorithms`、`Cipher`和`modes`类、`padding`模块。其中，`os`模块主要用于生成随机种子，`Cipher`和`modes`类用于创建加密和解密所需的实例，`padding`模块则用于填充。
+        k = b'6\x1a\xf66\x10\xc7\xec\xc8\xeb\xde\xf7\xce\xf6\x83\xc7\xe0k:\xae\xa2#\xc9\xd0\xd5\x974\x8e:=6\xddX'
+        v = b'Fuw\xec>f8\x97\x13\xf9\xb0\xcfp\xc6\xea\xd0'
+        self.mima = Cipher(algorithms.AES(k), modes.CBC(v))  # 实例化
+        # 然后，代码定义了一个16字节长的密钥`k`和一个16字节长的向量`v`
+        self.s = socket.socket()  # 创建 socket 对象
+        host = socket.gethostname()  # 获取本地主机名
+        port = 12965  # 设置端口号
+        self.s.connect((host, port))
+        threading.Thread(target=self.recv).start()
+
+    def Text(self):
+        threading.Thread(target=self.send).start()
+
+    def send(self):
+        text = self.textEdit.toPlainText()
+        enc = self.mima.encryptor()  # 加密
+        pad = padding.PKCS7(256).padder()  # 填充
+        aa = enc.update(pad.update(text.encode()) + pad.finalize()) + enc.finalize()  # 得到加密结果aa
+        self.s.send(aa)
+
+    def recv(self):
+        while True:
+            res = self.s.recv(1024)
+            dec = self.mima.decryptor()  # 解密方法
+            unpad = padding.PKCS7(256).unpadder()  # 拿掉填充
+            jm = unpad.update(dec.update(res) + dec.finalize()) + unpad.finalize()
+            jm = jm.decode()
+            print(jm)  # 输出解密内容
+            self.finished.emit(str(jm))
+
+    def updateText(self,ret:str):
+        self.textDisplay.setText(ret)
+
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")

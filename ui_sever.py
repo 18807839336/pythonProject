@@ -45,7 +45,7 @@ class Ui_MainWindow(QMainWindow):  # 传输一个具体的QMainWindow
     def ser_send(self):
         text = self.textEdit.toPlainText()+datetime.now()    #定义text变量为手动输入在文本显示框的内容
         length = len(text)
-        self.time_send.setText(length)
+        self.time_send.setText(length)#
         enc = self.mima.encryptor()  # 加密
         pad = padding.PKCS7(256).padder()  # 填充
         aa = enc.update(pad.update(text.encode()) + pad.finalize()) + enc.finalize()  # 将text加密得到结果aa

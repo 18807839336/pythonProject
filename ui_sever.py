@@ -56,12 +56,10 @@ class Ui_MainWindow(QMainWindow):  # 传输一个具体的QMainWindow
         self.textDisplay.setText(str(jm))  #在主页面textDisplay中显示解密内容
         self.textBrowser.setText(str(ret))   #在主页面中textBrowser显示加密内容
 
-
-
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(844, 506)
+        MainWindow.resize(933, 506)
         MainWindow.setStyleSheet(u"")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
@@ -71,22 +69,37 @@ class Ui_MainWindow(QMainWindow):  # 传输一个具体的QMainWindow
         self.widget.setObjectName(u"widget")
         self.gridLayout_2 = QGridLayout(self.widget)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
+        self.nameDisplay = QTextBrowser(self.widget)
+        self.nameDisplay.setObjectName(u"nameDisplay")
+
+        self.gridLayout_2.addWidget(self.nameDisplay, 0, 0, 1, 1)
+
         self.gridLayout_3 = QGridLayout()
         self.gridLayout_3.setObjectName(u"gridLayout_3")
-        self.textBrowser = QTextBrowser(self.widget)
-        self.textBrowser.setObjectName(u"textBrowser")
-        self.gridLayout_3.addWidget(self.textBrowser, 0, 0, 1, 1)
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-        self.gridLayout_3.addItem(self.horizontalSpacer_2, 1, 0, 1, 1)
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-        self.gridLayout_3.addItem(self.horizontalSpacer, 4, 0, 1, 1)
         self.textDisplay = QTextBrowser(self.widget)
         self.textDisplay.setObjectName(u"textDisplay")
         self.textDisplay.setMinimumSize(QSize(200, 200))
         font = QFont()
         font.setItalic(True)
         self.textDisplay.setFont(font)
-        self.gridLayout_3.addWidget(self.textDisplay, 2, 0, 1, 4)
+
+        self.gridLayout_3.addWidget(self.textDisplay, 2, 0, 1, 5)
+
+        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.gridLayout_3.addItem(self.horizontalSpacer_2, 1, 0, 1, 1)
+
+        self.pushButton_send = QPushButton(self.widget)
+        self.pushButton_send.setObjectName(u"pushButton_send")
+
+        self.gridLayout_3.addWidget(self.pushButton_send, 5, 3, 1, 1)
+
+        self.pushButton_end = QPushButton(self.widget)
+        self.pushButton_end.setObjectName(u"pushButton_end")
+        self.pushButton_end.setStyleSheet(u"")
+
+        self.gridLayout_3.addWidget(self.pushButton_end, 5, 4, 1, 1)
+
         self.textEdit = QTextEdit(self.widget)
         self.textEdit.setObjectName(u"textEdit")
         self.textEdit.setMinimumSize(QSize(600, 100))
@@ -96,45 +109,72 @@ class Ui_MainWindow(QMainWindow):  # 传输一个具体的QMainWindow
         font1.setUnderline(False)
         self.textEdit.setFont(font1)
         self.textEdit.setStyleSheet(u"background-color: rgb(161, 214, 255);")
-        self.gridLayout_3.addWidget(self.textEdit, 3, 0, 1, 4)
-        self.pushButton_send = QPushButton(self.widget)
-        self.pushButton_send.setObjectName(u"pushButton_send")
-        self.gridLayout_3.addWidget(self.pushButton_send, 4, 2, 1, 1)
-        self.pushButton_end = QPushButton(self.widget)
-        self.pushButton_end.setObjectName(u"pushButton_end")
-        self.pushButton_end.setStyleSheet(u"")
-        self.gridLayout_3.addWidget(self.pushButton_end, 4, 3, 1, 1)
-        self.verticalLayout = QVBoxLayout()
-        self.verticalLayout.setObjectName(u"verticalLayout")
-        self.gridLayout_3.addLayout(self.verticalLayout, 0, 1, 1, 1)
-        self.gridLayout_2.addLayout(self.gridLayout_3, 0, 5, 1, 1)
+
+        self.gridLayout_3.addWidget(self.textEdit, 3, 0, 1, 5)
+
+        self.time_send = QTextBrowser(self.widget)
+        self.time_send.setObjectName(u"time_send")
+
+        self.gridLayout_3.addWidget(self.time_send, 5, 0, 1, 1)
+
+        self.time_return = QTextBrowser(self.widget)
+        self.time_return.setObjectName(u"time_return")
+
+        self.gridLayout_3.addWidget(self.time_return, 5, 1, 1, 1)
+
+        self.textBrowser = QTextBrowser(self.widget)
+        self.textBrowser.setObjectName(u"textBrowser")
+        font2 = QFont()
+        font2.setPointSize(9)
+        self.textBrowser.setFont(font2)
+
+        self.gridLayout_3.addWidget(self.textBrowser, 0, 0, 1, 2)
+
+
+        self.gridLayout_2.addLayout(self.gridLayout_3, 0, 1, 1, 1)
+
+
         self.gridLayout.addWidget(self.widget, 0, 0, 1, 1)
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 844, 22))
+        self.menubar.setGeometry(QRect(0, 0, 933, 22))
         self.menu = QMenu(self.menubar)
         self.menu.setObjectName(u"menu")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
         MainWindow.setStatusBar(self.statusbar)
+
         self.menubar.addAction(self.menu.menuAction())
+
         self.retranslateUi(MainWindow)
+
         QMetaObject.connectSlotsByName(MainWindow)
-    # setupU
+    # setupUi
+
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
-        self.textEdit.setHtml(QCoreApplication.translate("MainWindow",
-                                                         u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-                                                         "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-                                                         "p, li { white-space: pre-wrap; }\n"
-                                                         "</style></head><body style=\" font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-                                                         "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>",
-                                                         None))
+        self.nameDisplay.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt;\">\u7231\u7761\u89c9\u7684\u661f\u661f</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt;\">\u53ef\u4e50\u52a0\u51b0</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt;\">\u7eff\u8c46\u997c\u7ec5\u58eb                             </span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px;"
+                        " margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt;\">\u4e9a\u5386\u5c71\u5927</span></p></body></html>", None))
         self.pushButton_send.setText(QCoreApplication.translate("MainWindow", u"\u53d1\u9001", None))
         self.pushButton_end.setText(QCoreApplication.translate("MainWindow", u"\u5173\u95ed", None))
-        self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u4e3b\u9875\u9762", None))
+        self.textEdit.setHtml(QCoreApplication.translate("MainWindow", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", None))
+        self.menu.setTitle(QCoreApplication.translate("MainWindow", u"\u52a0\u5bc6\u89e3\u5bc6\u804a\u5929\u4fe1\u606f\u8f6f\u4ef6", None))
     # retranslateUi
+
+
 
 

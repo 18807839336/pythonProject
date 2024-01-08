@@ -42,12 +42,14 @@ class Ui_Window(QMainWindow):
 
     def send(self):
         text = self.textEdit.toPlainText()#定义text变量为手动输入在文本显示框的内容
-        length = len(text)
-        self.time_send.setText(length)  ##
+        text+= "长度:%d,发送时间%s"%(len(text),str(datetime.datetime.now()))
+        # length = len(text)
+        #self.time_send.setText(length)  ##
+
         enc = self.mima.encryptor()  # 加密
         pad = padding.PKCS7(256).padder()  # 填充
         aa = enc.update(pad.update(text.encode()) + pad.finalize()) + enc.finalize()  # 将text加密得到结果aa
-        self.s.send(aa)+datetime.now() #发送加密信息aa
+        self.s.send(aa) #发送加密信息aa
 
 
     def updateText(self,ret:bytes):
@@ -56,10 +58,10 @@ class Ui_Window(QMainWindow):
         unpad = padding.PKCS7(256).unpadder()  # 拿掉填充
         jm = unpad.update(dec.update(ret) + dec.finalize()) + unpad.finalize()
         #定义变量jm为服务器端传入的ret解密内容
-        jm = jm.decode()
+        jm = jm.decode()+"接收时间%s"%(str(datetime.datetime.now()))
         print(jm)  # 输出解密内容
-        self.textDisplay.setText(jm)+datetime.now()   #在客户端textDisplay上显示内容
-        self.nameDisplay.setText(str(ret))+datetime.now()     #在客户端nameDisplay上显示ret内容，str强制转换成字符型
+        self.textDisplay.append(jm)   #在客户端textDisplay上显示内容
+        self.nameDisplay.append(str(ret))     #在客户端nameDisplay上显示ret内容，str强制转换成字符型
 
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():

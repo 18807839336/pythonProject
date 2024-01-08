@@ -1,8 +1,10 @@
+import datetime
 import threading
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 import socket
+import time
 
 from cryptography.hazmat.primitives.ciphers import algorithms, Cipher, modes
 from cryptography.hazmat.primitives import padding
@@ -26,7 +28,7 @@ class Ui_MainWindow(QMainWindow):  # 传输一个具体的QMainWindow
         #服务器端开放端口，等待客户端连接
         s = socket.socket()  # 创建 socket 对象
         host = socket.gethostname()  # 获取本地主机名
-        port = 12965  # 设置端口
+        port = 12963  # 设置端口
         s.bind((host, port))  # 绑定端口
         s.listen()  # 监听
         self.c, self.addr = s.accept()    #实例化对象之后要用self，表明是对象自己的属性
@@ -41,11 +43,14 @@ class Ui_MainWindow(QMainWindow):  # 传输一个具体的QMainWindow
         threading.Thread(target=self.ser_send).start()
 
     def ser_send(self):
-        text = self.textEdit.toPlainText()   #定义text变量为手动输入在文本显示框的内容
+        text = self.textEdit.toPlainText()+datetime.now()    #定义text变量为手动输入在文本显示框的内容
+        length = len(text)
+        self.time_send.setText(length)
         enc = self.mima.encryptor()  # 加密
         pad = padding.PKCS7(256).padder()  # 填充
         aa = enc.update(pad.update(text.encode()) + pad.finalize()) + enc.finalize()  # 将text加密得到结果aa
-        self.c.send(aa)  # 发送加密信息aa
+        self.c.send(aa)# 发送加密信息aa
+
 
     def updateText(self, ret: bytes):
         dec = self.mima.decryptor()  # 解密方法
@@ -53,8 +58,8 @@ class Ui_MainWindow(QMainWindow):  # 传输一个具体的QMainWindow
         jm = unpad.update(dec.update(ret) + dec.finalize()) + unpad.finalize()
         jm = jm.decode()
         print(jm)  # 输出解密内容
-        self.textDisplay.setText(str(jm))  #在主页面textDisplay中显示解密内容
-        self.textBrowser.setText(str(ret))   #在主页面中textBrowser显示加密内容
+        self.textDisplay.setText(str(jm))+datetime.now()   #在主页面textDisplay中显示解密内容
+        self.textBrowser.setText(str(ret))+datetime.now()   #在主页面中textBrowser显示加密内容
 
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():

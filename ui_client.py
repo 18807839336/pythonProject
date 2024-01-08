@@ -1,5 +1,7 @@
 import threading
 import socket
+import datetime
+
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -24,14 +26,14 @@ class Ui_Window(QMainWindow):
         #和服务器端sever进行连接
         self.s = socket.socket()  # 创建 socket 对象
         host = socket.gethostname()  # 获取本地主机名
-        port = 12965  # 设置端口号
+        port = 12963  # 设置端口号
         self.s.connect((host, port))
         #启动一个线程，函数为recv
         threading.Thread(target=self.recv).start()
 
     def recv(self):
         while True:
-            res = self.s.recv(1024)  #定义res变量为服务器端发送过来的内容
+            res = self.s.recv(1024) #定义res变量为服务器端发送过来的内容
             self.finished.emit(res)  #将内容发送给信息，要跟新内容
 
     def Text(self):
@@ -39,11 +41,12 @@ class Ui_Window(QMainWindow):
         threading.Thread(target=self.send).start()
 
     def send(self):
-        text = self.textEdit.toPlainText()  #定义text变量为手动输入在文本显示框的内容
+        text = self.textEdit.toPlainText()#定义text变量为手动输入在文本显示框的内容
         enc = self.mima.encryptor()  # 加密
         pad = padding.PKCS7(256).padder()  # 填充
         aa = enc.update(pad.update(text.encode()) + pad.finalize()) + enc.finalize()  # 将text加密得到结果aa
-        self.s.send(aa)  #发送加密信息aa
+        self.s.send(aa)+datetime.now() #发送加密信息aa
+
 
     def updateText(self,ret:bytes):
         #ret(形参，随便命名，不要和上面的res起冲突):服务器端发送过来的内容，以字节流形式传入函数，bytes表示传入该函数为字节流形式
@@ -53,8 +56,8 @@ class Ui_Window(QMainWindow):
         #定义变量jm为服务器端传入的ret解密内容
         jm = jm.decode()
         print(jm)  # 输出解密内容
-        self.textDisplay.setText(jm)  #在客户端textDisplay上显示内容
-        self.nameDisplay.setText(str(ret))    #在客户端nameDisplay上显示ret内容，str强制转换成字符型
+        self.textDisplay.setText(jm)+datetime.now()   #在客户端textDisplay上显示内容
+        self.nameDisplay.setText(str(ret))+datetime.now()     #在客户端nameDisplay上显示ret内容，str强制转换成字符型
 
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
